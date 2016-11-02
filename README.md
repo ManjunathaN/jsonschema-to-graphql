@@ -5,6 +5,11 @@
 Generate the GraphQL Schema (**Non-Relay Compliant**) by providing JSON Schema files. Refer examples folder for more sample implementation.  
 Default knex-based resolver is provided. You can extend the resolver to add your own implementation.  
 
+## Installation
+```
+npm install jsonschema-to-graphql
+```
+
 ## Running Sample Locally  
 ```
 npm run sample
