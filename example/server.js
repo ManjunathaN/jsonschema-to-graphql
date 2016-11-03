@@ -36,7 +36,13 @@ var resolver = new Resolver(knex);
 
 // Start
 var app = Express();
-var graphQlBuilder = GraphQL.builder(resolver);
+var graphQlBuilder = GraphQL.builder({
+  // resolver,
+  skipConstraintModels: false,
+  skipOperatorFields: false,
+  skipPaginationFields: false,
+  skipSortByFields: false
+});
 
 // This is all you need to do to generate the schema.
 var graphQlSchema = graphQlBuilder

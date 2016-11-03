@@ -35,14 +35,17 @@ var _argsFactory = require('./argsFactory');
 
 var _argsFactory2 = _interopRequireDefault(_argsFactory);
 
+var _defaultResolver = require('./defaultResolver');
+
+var _defaultResolver2 = _interopRequireDefault(_defaultResolver);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // http://dataprotocols.readthedocs.io/en/latest/json-table-schema.html
-/* eslint-disable object-shorthand */
-var JSONSchemaValidator = require('jsontableschema').validate;
+var JSONSchemaValidator = require('jsontableschema').validate; /* eslint-disable object-shorthand */
 
 var SchemaBuilder = function () {
-  function SchemaBuilder(resolver) {
+  function SchemaBuilder(opts) {
     (0, _classCallCheck3.default)(this, SchemaBuilder);
 
     // Field to Store all the Schema Definitions provided for building the graphQL
@@ -52,7 +55,15 @@ var SchemaBuilder = function () {
     // GraphQL Model Type Definitions
     this.modelTypeDefs = {};
     // Resolvers.
-    this.resolver = resolver;
+    this.resolver = opts.resolver || new _defaultResolver2.default();
+    // Skip Constraint Models
+    this.skipConstraintModels = opts.skipConstraintModels || false;
+    // Skip Operator Fields
+    this.skipOperatorFields = opts.skipOperatorFields || false;
+    // Skip Pagination Fields
+    this.skipPaginationFields = opts.skipPaginationFields || false;
+    // Skip SortBy Fields
+    this.skipSortByFields = opts.skipSortByFields || false;
     // Custom Query Functions 
     this.customQueryFunctions = {};
     // Custom Mutation Functions
@@ -146,7 +157,9 @@ var SchemaBuilder = function () {
         var singleFieldName = _this.getSingleFieldName(modelData);
 
         fields[singleFieldName] = _this.processModelData(modelData);
-        _lodash2.default.assign(fields, _this.prepareConstraintFields(singleFieldName, modelData));
+        if (!_this.skipConstraintModels) {
+          _lodash2.default.assign(fields, _this.prepareConstraintFields(singleFieldName, modelData));
+        }
 
         // Handle for List Models.
         var listFieldName = (0, _pluralize2.default)(singleFieldName);
@@ -335,7 +348,7 @@ var SchemaBuilder = function () {
     value: function rootListField(modelData, fields, skipReqArgs) {
       var retValue = {
         type: new _graphql.GraphQLList(this.typeForModel(modelData, fields)),
-        args: _lodash2.default.assign({}, skipReqArgs ? {} : this.prepareArgsForModel(modelData, fields), skipReqArgs ? this.prepareOperatorArgsForModel(modelData) : {}, _argsFactory2.default.preparePaginationArgsForModel(), this.prepareSortArgsForModel(modelData.tableName)),
+        args: _lodash2.default.assign({}, skipReqArgs ? {} : this.prepareArgsForModel(modelData, fields), this.skipOperatorFields ? {} : skipReqArgs ? this.prepareOperatorArgsForModel(modelData) : {}, this.skipPaginationFields ? {} : _argsFactory2.default.preparePaginationArgsForModel(), this.skipSortByFields ? {} : this.prepareSortArgsForModel(modelData.tableName)),
         resolve: this.resolver.read()
       };
       return retValue;
@@ -429,7 +442,7 @@ var SchemaBuilder = function () {
       if ((0, _pluralize2.default)(relation.name) === relation.name) {
         graphType = new _graphql.GraphQLList(type);
         foreignKey = relation.reference.fields; // relation.fields;
-        args = _lodash2.default.assign({}, _argsFactory2.default.preparePaginationArgsForModel(), this.prepareSortArgsForModel(joinTableName));
+        args = _lodash2.default.assign({}, this.skipPaginationFields ? {} : _argsFactory2.default.preparePaginationArgsForModel(), this.skipSortByFields ? {} : this.prepareSortArgsForModel(joinTableName));
       }
 
       var typeField = {

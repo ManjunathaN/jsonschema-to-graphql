@@ -11,13 +11,14 @@ import pluralize from 'pluralize';
 import utils from './utils';
 import jsonSchemaUtils from './jsonSchemaUtils';
 import argsFactory from './argsFactory';
+import DefaultResolver from './defaultResolver';
 
 // http://dataprotocols.readthedocs.io/en/latest/json-table-schema.html
 const JSONSchemaValidator = require('jsontableschema').validate;
 
 export default class SchemaBuilder {
 
-  constructor(resolver) {
+  constructor(opts) {
     // Field to Store all the Schema Definitions provided for building the graphQL
     this.schemaDefs = [];
     // Model Object for processing...
@@ -25,7 +26,15 @@ export default class SchemaBuilder {
     // GraphQL Model Type Definitions
     this.modelTypeDefs = {};
     // Resolvers.
-    this.resolver = resolver;
+    this.resolver = opts.resolver || new DefaultResolver();
+    // Skip Constraint Models
+    this.skipConstraintModels = opts.skipConstraintModels || false;
+    // Skip Operator Fields
+    this.skipOperatorFields = opts.skipOperatorFields || false;
+    // Skip Pagination Fields
+    this.skipPaginationFields = opts.skipPaginationFields || false;
+    // Skip SortBy Fields
+    this.skipSortByFields = opts.skipSortByFields || false;
     // Custom Query Functions 
     this.customQueryFunctions = {};
     // Custom Mutation Functions
@@ -102,7 +111,9 @@ export default class SchemaBuilder {
       const singleFieldName = this.getSingleFieldName(modelData);
 
       fields[singleFieldName] = this.processModelData(modelData);
-      _.assign(fields, this.prepareConstraintFields(singleFieldName, modelData));
+      if (!this.skipConstraintModels) {
+        _.assign(fields, this.prepareConstraintFields(singleFieldName, modelData));
+      }
 
       // Handle for List Models.
       const listFieldName = pluralize(singleFieldName);
@@ -280,9 +291,9 @@ export default class SchemaBuilder {
       type: new GraphQLList(this.typeForModel(modelData, fields)),
       args: _.assign({},
         skipReqArgs ? {} : this.prepareArgsForModel(modelData, fields),
-        skipReqArgs ? this.prepareOperatorArgsForModel(modelData) : {},
-        argsFactory.preparePaginationArgsForModel(),
-        this.prepareSortArgsForModel(modelData.tableName)),
+        this.skipOperatorFields ? {} : (skipReqArgs ? this.prepareOperatorArgsForModel(modelData) : {}),
+        this.skipPaginationFields ? {} : argsFactory.preparePaginationArgsForModel(),
+        this.skipSortByFields ? {} : this.prepareSortArgsForModel(modelData.tableName)),
       resolve: this.resolver.read()
     };
     return retValue;
@@ -361,8 +372,8 @@ export default class SchemaBuilder {
       graphType = new GraphQLList(type);
       foreignKey = relation.reference.fields; // relation.fields;
       args = _.assign({},
-        argsFactory.preparePaginationArgsForModel(),
-        this.prepareSortArgsForModel(joinTableName)
+        this.skipPaginationFields ? {} : argsFactory.preparePaginationArgsForModel(),
+        this.skipSortByFields ? {} : this.prepareSortArgsForModel(joinTableName)
       );
     }
 
