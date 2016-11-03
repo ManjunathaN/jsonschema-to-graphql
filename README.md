@@ -17,14 +17,22 @@ npm run sample
 
 ## Usage  
 ```
-var GraphQL = require('../');
+var GraphQL = require('jsonschema-to-graphql');
 // Add a Resolver, Can be replace with custom resolvers 
 var Resolver = require('../dist/knex-resolver');
 var resolver = new Resolver(knex);
 
+var opts = {
+  resolver : resolver,
+  skipConstraintModels: false,
+  skipOperatorFields: false,
+  skipPaginationFields: false,
+  skipSortByFields: false
+};
+
 // Build GraphQL Schema
 // This is all you need to do to generate the schema.
-var graphQLSchema  = GraphQL.builder(resolver)
+var graphQLSchema  = GraphQL.builder(opts)
 	.addSchema(require('./schemas/User'), {
     exclude: ['ignoreField']
   })
@@ -33,6 +41,12 @@ var graphQLSchema  = GraphQL.builder(resolver)
   .build();
 ```
 
+Builder accepts `opts` parameter:  
+  - `resolver`: default resolver is a no-op function return empty array/object.  
+  - `skipConstraintModels`: to skip Models generated based on primary keys and unique keys.  
+  - `skipOperatorFields`: to skip Operator fields in the list models.  
+  - `skipPaginationFields`: to skip pagination fields.  
+  - `skipSortByFields`: to skip order related fields.  
 `addSchema` accepts two parameters - schema definition and options.  
 `addCustomQueryFunction` can be used to add custom query functions.  
 `addCustomMutationFunction` can be used to add custom mutation functions.
@@ -100,15 +114,15 @@ Movie(id: Int!): Movie
 
 // List Model, with operators.
 Movies(  
-id\_Gt: Int,   
-id\_Gte: Int,   
-id\_Lt: Int,   
-id\_Lte: Int,   
-id\_Ne: Int,   
-id\_In: [Int]  
-id\_NotIn: [Int]  
+id_Gt: Int,   
+id_Gte: Int,   
+id_Lt: Int,   
+id_Lte: Int,   
+id_Ne: Int,   
+id_In: [Int]  
+id_NotIn: [Int]  
 id: Int,  
-id\_IsNull: Boolean, ...  
+id_IsNull: Boolean, ...  
 limit: Int,  
 offset: Int,  
 sortBy: MoviePropertiesEnum,  

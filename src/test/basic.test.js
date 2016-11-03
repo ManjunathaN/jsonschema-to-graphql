@@ -49,7 +49,9 @@ describe('integration tests', () => {
     });
 
     schema = mainModule
-      .builder(graphQLResolver)
+      .builder({
+        resolver: graphQLResolver
+      })
       .addSchema(require('../../example/schemas/User'), {
         exclude: ['ignoreField']
       })
