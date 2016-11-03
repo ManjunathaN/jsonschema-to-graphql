@@ -41,12 +41,13 @@ var graphQLSchema  = GraphQL.builder(opts)
   .build();
 ```
 
-Builder accepts `opts` parameter:  
+Builder accepts `opts` parameter:    
   - `resolver`: default resolver is a no-op function return empty array/object.  
   - `skipConstraintModels`: to skip Models generated based on primary keys and unique keys.  
   - `skipOperatorFields`: to skip Operator fields in the list models.  
   - `skipPaginationFields`: to skip pagination fields.  
   - `skipSortByFields`: to skip order related fields.  
+  
 `addSchema` accepts two parameters - schema definition and options.  
 `addCustomQueryFunction` can be used to add custom query functions.  
 `addCustomMutationFunction` can be used to add custom mutation functions.
