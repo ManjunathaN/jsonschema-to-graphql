@@ -37,7 +37,7 @@ var resolver = new Resolver(knex);
 // Start
 var app = Express();
 var graphQlBuilder = GraphQL.builder({
-  // resolver,
+  resolver: resolver,
   skipConstraintModels: false,
   skipOperatorFields: false,
   skipPaginationFields: false,
