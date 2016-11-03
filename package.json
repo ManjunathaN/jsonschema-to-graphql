@@ -1,7 +1,7 @@
 {
   "name": "jsonschema-to-graphql",
   "version": "0.0.4",
-  "description": "Convert JsonSchema to GraphQL Schema",
+  "description": "Generate GraphQL schema from JSON schemas.",
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf dist",
@@ -13,8 +13,26 @@
     "example": "node example/server",
     "prepublish": "npm run clean && npm run build"
   },
-  "author": "",
+  "keywords": [
+    "graphql",
+    "knex",
+    "schema",
+    "reflection",
+    "json",
+    "query",
+    "mutation",
+    "generate"
+  ],
+  "author": "Manjunatha N <natha.manju@gmail.com>",
   "license": "ISC",
+  "homepage": "https://github.com/ManjunathaN/jsonschema-to-graphql#readme",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ManjunathaN/jsonschema-to-graphql.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ManjunathaN/jsonschema-to-graphql/issues"
+  },
   "dependencies": {
     "bluebird": "^3.4.6",
     "dataloader": "^1.2.0",
