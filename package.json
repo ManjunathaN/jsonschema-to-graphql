@@ -1,6 +1,6 @@
 {
   "name": "jsonschema-to-graphql",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Convert JsonSchema to GraphQL Schema",
   "main": "index.js",
   "scripts": {
