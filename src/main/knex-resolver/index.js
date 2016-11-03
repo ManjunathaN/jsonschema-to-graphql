@@ -16,14 +16,14 @@ export default class Resolver {
     return (info.returnType instanceof GraphQLList) ? results : _.head(results);
   }
 
-  executeQuery(queryString, options, info) {
+  executeQuery(schemaDef, queryString, options, info) {
     if (options && options.dataLoader) {
       return options.dataLoader.load(queryString).then((result) => this.returnResults(result, info));
     }
     return this.knex.raw(queryString).then((result) => this.returnResults(result, info));
   }
 
-  relation(relation) {
+  relation(schemaDef, relation) {
     const knex = this.knex;
     return (parent, args, options, info) => {
       try {
@@ -33,7 +33,7 @@ export default class Resolver {
           });
 
         const queryString = knex.raw(query.toString(), args).toString();
-        return this.executeQuery(queryString, options, info);
+        return this.executeQuery(schemaDef, queryString, options, info);
       } catch (err) {
         // eslint-disable-next-line no-console
         console.log('error occurred in object() :: ', err);
@@ -42,13 +42,13 @@ export default class Resolver {
     };
   }
 
-  read() {
+  read(schemaDef) {
     const knex = this.knex;
     return (parent, args, options, info) => {
       try {
         const query = QueryBuilder.buildSelect(info.fieldASTs, knex, info, args);
         const queryString = knex.raw(query.toString(), args).toString();
-        return this.executeQuery(queryString, options, info);
+        return this.executeQuery(schemaDef, queryString, options, info);
       } catch (err) {
         // eslint-disable-next-line no-console
         console.log('error occurred in object() :: ', err);
@@ -57,11 +57,12 @@ export default class Resolver {
     };
   }
 
-  create(tableName) {
+  create(schemaDef) {
     const knex = this.knex;
     return (parent, args, options, info) => {
       try {
-        return knex(tableName).insert(args, ['*']).then((result) => this.returnResults(result, info));
+        return knex(schemaDef.tableName).insert(args, ['*']).then((result) =>
+          this.returnResults(result, info));
       } catch (err) {
         // eslint-disable-next-line no-console
         console.log('error occurred in object() :: ', err);
@@ -70,18 +71,19 @@ export default class Resolver {
     };
   }
 
-  update(tableName, primaryKeys) {
+  update(schemaDef) {
     const knex = this.knex;
     return (parent, args, options, info) => {
       try {
-        const query = knex(tableName);
+        const query = knex(schemaDef.tableName);
         // console.log('primaryKeys ::', primaryKeys);
-        _.each(primaryKeys, (arg) => {
+        _.each(schemaDef.primaryKeys, (arg) => {
           console.log(arg, args[arg]);
           query.where(arg, args[arg]);
         });
 
-        const updateArgs = _.omit(args, primaryKeys);
+        const updateArgs = _.omit(args, schemaDef.primaryKeys);
+
         // console.log('updateArgs :: ', updateArgs);
         if (_.isEmpty(updateArgs)) {
           throw new Error('Nothing to update');
@@ -95,11 +97,11 @@ export default class Resolver {
     };
   }
 
-  delete(tableName) {
+  delete(schemaDef) {
     const knex = this.knex;
     return (parent, args, options, info) => {
       try {
-        const query = knex(tableName);
+        const query = knex(schemaDef.tableName);
         _.each(args, (value, arg) => query.where(arg, value))
         return query.delete('*').then((result) => this.returnResults(result, info));
       } catch (err) {

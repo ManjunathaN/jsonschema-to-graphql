@@ -55,4 +55,5 @@ Thumbs.db
 
 # Personal Files
 TODO.MD
-testdb.sqlite3
+*.sqlite3
+myserver.js

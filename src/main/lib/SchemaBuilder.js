@@ -58,6 +58,7 @@ export default class SchemaBuilder {
     // Update Models hash for building the schema.
     // TODO: check referencial integrity violations.
     this.models[tableName] = {
+      schemaDef: schemaFile,
       // TableName
       tableName,
       // Properties in the schema, this will be used to populate fields attribute.
@@ -265,16 +266,16 @@ export default class SchemaBuilder {
 
     switch (mutationOpts) {
       case 'create':
-        resolveHandler = this.resolver.create(modelData.tableName);
+        resolveHandler = this.resolver.create(modelData.schemaDef);
         break;
       case 'update':
-        resolveHandler = this.resolver.update(modelData.tableName, modelData.primaryKeys);
+        resolveHandler = this.resolver.update(modelData.schemaDef);
         break;
       case 'delete':
-        resolveHandler = this.resolver.delete(modelData.tableName);
+        resolveHandler = this.resolver.delete(modelData.schemaDef);
         break;
       default:
-        resolveHandler = this.resolver.read();
+        resolveHandler = this.resolver.read(modelData.schemaDef);
         break;
     }
 
@@ -294,7 +295,7 @@ export default class SchemaBuilder {
         this.skipOperatorFields ? {} : (skipReqArgs ? this.prepareOperatorArgsForModel(modelData) : {}),
         this.skipPaginationFields ? {} : argsFactory.preparePaginationArgsForModel(),
         this.skipSortByFields ? {} : this.prepareSortArgsForModel(modelData.tableName)),
-      resolve: this.resolver.read()
+      resolve: this.resolver.read(modelData.schemaDef)
     };
     return retValue;
   }
@@ -354,13 +355,13 @@ export default class SchemaBuilder {
 
     _.forOwn(modelData.foreignKeys, (relation) => {
       const joinTableName = this.fieldNameForModel(relation.reference.resource);
-      fields[relation.name] = this.relationField(joinTableName, relation);
+      fields[relation.name] = this.relationField(modelData, joinTableName, relation);
     });
 
     return fields;
   }
 
-  relationField(joinTableName, relation) {
+  relationField(modelData, joinTableName, relation) {
     const type = this.typeForModel({
       tableName: joinTableName
     });
@@ -381,7 +382,7 @@ export default class SchemaBuilder {
       type: graphType,
       description: relation.description,
       args: args,
-      resolve: this.resolver.relation({
+      resolve: this.resolver.relation(modelData.schemaDef, {
         foreignKey: foreignKey,
         foreignKeyValue: relation.fields
       })

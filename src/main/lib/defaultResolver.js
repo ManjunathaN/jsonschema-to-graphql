@@ -11,7 +11,7 @@ export default class Resolver {
     return (info.returnType instanceof GraphQLList) ? [] : {};
   }
 
-  relation(relation) {
+  relation(schemaDef, relation) {
     const knex = this.knex;
     return (parent, args, options, info) => {
       console.log('relation called');
@@ -19,28 +19,28 @@ export default class Resolver {
     };
   }
 
-  read() {
+  read(schemaDef) {
     return (parent, args, options, info) => {
       console.log('read called');
       return this.returnResults(info);
     };
   }
 
-  create(tableName) {
+  create(schemaDef) {
     return (parent, args, options, info) => {
       console.log('create called');
       return this.returnResults(info);
     };
   }
 
-  update(tableName, primaryKeys) {
+  update(schemaDef) {
     return (parent, args, options, info) => {
       console.log('update called');
       return this.returnResults(info);
     };
   }
 
-  delete(tableName) {
+  delete(schemaDef) {
     return (parent, args, options, info) => {
       console.log('delete called');
       return this.returnResults(info);

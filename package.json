@@ -10,6 +10,7 @@
     "test": "mocha --slow 10 --timeout 5000 --reporter spec --recursive --require babel-register src/test",
     "test:watch": "npm run test -- --watch",
     "start": "nodemon -r babel-core/register src/main/index.js",
+    "testserver": "nodemon -r babel-core/register myserver.js",
     "example": "node example/server",
     "prepublish": "npm run clean && npm run build"
   },
