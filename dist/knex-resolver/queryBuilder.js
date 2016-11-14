@@ -143,7 +143,9 @@ function handleQuerySelectionSet(field, query, vardefs, options, userInputArgs) 
     objectName = options.returnType ? options.returnType.name : field.name.value;
   }
 
-  query.from(objectName.toLowerCase());
+  if (!options.returnType instanceof _graphql.GraphQLScalarType) {
+    query.from(objectName.toLowerCase());
+  }
 }
 
 module.exports = {

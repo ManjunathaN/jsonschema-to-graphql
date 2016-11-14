@@ -97,6 +97,7 @@ var SchemaBuilder = function () {
       // Update Models hash for building the schema.
       // TODO: check referencial integrity violations.
       this.models[tableName] = {
+        schemaDef: schemaFile,
         // TableName
         tableName: tableName,
         // Properties in the schema, this will be used to populate fields attribute.
@@ -133,6 +134,18 @@ var SchemaBuilder = function () {
       return retValue;
     }
   }, {
+    key: 'processModelCountData',
+    value: function processModelCountData(modelData) {
+      var fields = _jsonSchemaUtils2.default.jsonSchemaToGraphQLFields(modelData.tableName, modelData.properties, {
+        include: modelData.opt.include,
+        exclude: modelData.opt.exclude,
+        typeDefs: this.modelTypeDefs
+      });
+
+      var retValue = this.rootCountListField(modelData, fields, true);
+      return retValue;
+    }
+  }, {
     key: 'getSingleFieldName',
     value: function getSingleFieldName(modelData) {
       var defaultFieldName = this.fieldNameForModel(modelData.tableName);
@@ -164,6 +177,10 @@ var SchemaBuilder = function () {
         // Handle for List Models.
         var listFieldName = (0, _pluralize2.default)(singleFieldName);
         fields[listFieldName] = _this.processModelData(modelData, true, true);
+
+        // Handle for List Models.
+        var countFieldName = listFieldName + "Count";
+        fields[countFieldName] = _this.processModelCountData(modelData);
       });
 
       return fields;
@@ -323,16 +340,16 @@ var SchemaBuilder = function () {
 
       switch (mutationOpts) {
         case 'create':
-          resolveHandler = this.resolver.create(modelData.tableName);
+          resolveHandler = this.resolver.create(modelData.schemaDef);
           break;
         case 'update':
-          resolveHandler = this.resolver.update(modelData.tableName, modelData.primaryKeys);
+          resolveHandler = this.resolver.update(modelData.schemaDef);
           break;
         case 'delete':
-          resolveHandler = this.resolver.delete(modelData.tableName);
+          resolveHandler = this.resolver.delete(modelData.schemaDef);
           break;
         default:
-          resolveHandler = this.resolver.read();
+          resolveHandler = this.resolver.read(modelData.schemaDef);
           break;
       }
 
@@ -349,8 +366,19 @@ var SchemaBuilder = function () {
       var retValue = {
         type: new _graphql.GraphQLList(this.typeForModel(modelData, fields)),
         args: _lodash2.default.assign({}, skipReqArgs ? {} : this.prepareArgsForModel(modelData, fields), this.skipOperatorFields ? {} : skipReqArgs ? this.prepareOperatorArgsForModel(modelData) : {}, this.skipPaginationFields ? {} : _argsFactory2.default.preparePaginationArgsForModel(), this.skipSortByFields ? {} : this.prepareSortArgsForModel(modelData.tableName)),
-        resolve: this.resolver.read()
+        resolve: this.resolver.read(modelData.schemaDef)
       };
+      return retValue;
+    }
+  }, {
+    key: 'rootCountListField',
+    value: function rootCountListField(modelData, fields, skipReqArgs) {
+      var retValue = {
+        type: _graphql.GraphQLInt,
+        args: _lodash2.default.assign({}, skipReqArgs ? {} : this.prepareArgsForModel(modelData, fields), this.skipOperatorFields ? {} : skipReqArgs ? this.prepareOperatorArgsForModel(modelData) : {}, this.skipPaginationFields ? {} : _argsFactory2.default.preparePaginationArgsForModel(), this.skipSortByFields ? {} : this.prepareSortArgsForModel(modelData.tableName)),
+        resolve: this.resolver.count(modelData.schemaDef)
+      };
+
       return retValue;
     }
 
@@ -424,14 +452,14 @@ var SchemaBuilder = function () {
 
       _lodash2.default.forOwn(modelData.foreignKeys, function (relation) {
         var joinTableName = _this4.fieldNameForModel(relation.reference.resource);
-        fields[relation.name] = _this4.relationField(joinTableName, relation);
+        fields[relation.name] = _this4.relationField(modelData, joinTableName, relation);
       });
 
       return fields;
     }
   }, {
     key: 'relationField',
-    value: function relationField(joinTableName, relation) {
+    value: function relationField(modelData, joinTableName, relation) {
       var type = this.typeForModel({
         tableName: joinTableName
       });
@@ -449,7 +477,7 @@ var SchemaBuilder = function () {
         type: graphType,
         description: relation.description,
         args: args,
-        resolve: this.resolver.relation({
+        resolve: this.resolver.relation(modelData.schemaDef, {
           foreignKey: foreignKey,
           foreignKeyValue: relation.fields
         })

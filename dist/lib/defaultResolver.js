@@ -31,7 +31,7 @@ var Resolver = function () {
     }
   }, {
     key: 'relation',
-    value: function relation(_relation) {
+    value: function relation(schemaDef, _relation) {
       var _this = this;
 
       var knex = this.knex;
@@ -42,7 +42,7 @@ var Resolver = function () {
     }
   }, {
     key: 'read',
-    value: function read() {
+    value: function read(schemaDef) {
       var _this2 = this;
 
       return function (parent, args, options, info) {
@@ -51,8 +51,16 @@ var Resolver = function () {
       };
     }
   }, {
+    key: 'count',
+    value: function count(schemaDef) {
+      return function (parent, args, options, info) {
+        console.log('count called');
+        return 0;
+      };
+    }
+  }, {
     key: 'create',
-    value: function create(tableName) {
+    value: function create(schemaDef) {
       var _this3 = this;
 
       return function (parent, args, options, info) {
@@ -62,7 +70,7 @@ var Resolver = function () {
     }
   }, {
     key: 'update',
-    value: function update(tableName, primaryKeys) {
+    value: function update(schemaDef) {
       var _this4 = this;
 
       return function (parent, args, options, info) {
@@ -72,7 +80,7 @@ var Resolver = function () {
     }
   }, {
     key: 'delete',
-    value: function _delete(tableName) {
+    value: function _delete(schemaDef) {
       var _this5 = this;
 
       return function (parent, args, options, info) {

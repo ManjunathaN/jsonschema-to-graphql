@@ -50,7 +50,7 @@ var Resolver = function () {
     }
   }, {
     key: 'executeQuery',
-    value: function executeQuery(queryString, options, info) {
+    value: function executeQuery(schemaDef, queryString, options, info) {
       var _this = this;
 
       if (options && options.dataLoader) {
@@ -64,7 +64,7 @@ var Resolver = function () {
     }
   }, {
     key: 'relation',
-    value: function relation(_relation) {
+    value: function relation(schemaDef, _relation) {
       var _this2 = this;
 
       var knex = this.knex;
@@ -73,7 +73,7 @@ var Resolver = function () {
           var query = _queryBuilder2.default.buildSelect(info.fieldASTs, knex, info, args).where((0, _defineProperty3.default)({}, _relation.foreignKey, parent[_relation.foreignKeyValue]));
 
           var queryString = knex.raw(query.toString(), args).toString();
-          return _this2.executeQuery(queryString, options, info);
+          return _this2.executeQuery(schemaDef, queryString, options, info);
         } catch (err) {
           // eslint-disable-next-line no-console
           console.log('error occurred in object() :: ', err);
@@ -83,7 +83,7 @@ var Resolver = function () {
     }
   }, {
     key: 'read',
-    value: function read() {
+    value: function read(schemaDef) {
       var _this3 = this;
 
       var knex = this.knex;
@@ -91,7 +91,28 @@ var Resolver = function () {
         try {
           var query = _queryBuilder2.default.buildSelect(info.fieldASTs, knex, info, args);
           var queryString = knex.raw(query.toString(), args).toString();
-          return _this3.executeQuery(queryString, options, info);
+          return _this3.executeQuery(schemaDef, queryString, options, info);
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.log('error occurred in object() :: ', err);
+          throw err;
+        }
+      };
+    }
+  }, {
+    key: 'count',
+    value: function count(schemaDef) {
+      var _this4 = this;
+
+      var knex = this.knex;
+      return function (parent, args, options, info) {
+        try {
+          var query = _queryBuilder2.default.buildSelect(info.fieldASTs, knex, info, args);
+          query.count('1 as count').from(schemaDef.tableName);
+          var queryString = knex.raw(query.toString(), args).toString();
+          return _this4.knex.raw(queryString).then(function (result) {
+            return _this4.returnResults(result, info).count;
+          });
         } catch (err) {
           // eslint-disable-next-line no-console
           console.log('error occurred in object() :: ', err);
@@ -101,14 +122,14 @@ var Resolver = function () {
     }
   }, {
     key: 'create',
-    value: function create(tableName) {
-      var _this4 = this;
+    value: function create(schemaDef) {
+      var _this5 = this;
 
       var knex = this.knex;
       return function (parent, args, options, info) {
         try {
-          return knex(tableName).insert(args, ['*']).then(function (result) {
-            return _this4.returnResults(result, info);
+          return knex(schemaDef.tableName).insert(args, ['*']).then(function (result) {
+            return _this5.returnResults(result, info);
           });
         } catch (err) {
           // eslint-disable-next-line no-console
@@ -119,28 +140,29 @@ var Resolver = function () {
     }
   }, {
     key: 'update',
-    value: function update(tableName, primaryKeys) {
-      var _this5 = this;
+    value: function update(schemaDef) {
+      var _this6 = this;
 
       var knex = this.knex;
       return function (parent, args, options, info) {
         try {
           var _ret = function () {
-            var query = knex(tableName);
+            var query = knex(schemaDef.tableName);
             // console.log('primaryKeys ::', primaryKeys);
-            _lodash2.default.each(primaryKeys, function (arg) {
+            _lodash2.default.each(schemaDef.primaryKeys, function (arg) {
               console.log(arg, args[arg]);
               query.where(arg, args[arg]);
             });
 
-            var updateArgs = _lodash2.default.omit(args, primaryKeys);
+            var updateArgs = _lodash2.default.omit(args, schemaDef.primaryKeys);
+
             // console.log('updateArgs :: ', updateArgs);
             if (_lodash2.default.isEmpty(updateArgs)) {
               throw new Error('Nothing to update');
             }
             return {
               v: query.update(updateArgs, ['*']).then(function (result) {
-                return _this5.returnResults(result, info);
+                return _this6.returnResults(result, info);
               })
             };
           }();
@@ -155,20 +177,20 @@ var Resolver = function () {
     }
   }, {
     key: 'delete',
-    value: function _delete(tableName) {
-      var _this6 = this;
+    value: function _delete(schemaDef) {
+      var _this7 = this;
 
       var knex = this.knex;
       return function (parent, args, options, info) {
         try {
           var _ret2 = function () {
-            var query = knex(tableName);
+            var query = knex(schemaDef.tableName);
             _lodash2.default.each(args, function (value, arg) {
               return query.where(arg, value);
             });
             return {
               v: query.delete('*').then(function (result) {
-                return _this6.returnResults(result, info);
+                return _this7.returnResults(result, info);
               })
             };
           }();

@@ -57,6 +57,22 @@ export default class Resolver {
     };
   }
 
+  count(schemaDef) {
+    const knex = this.knex;
+    return (parent, args, options, info) => {
+      try {
+        const query = QueryBuilder.buildSelect(info.fieldASTs, knex, info, args);
+        query.count('1 as count').from(schemaDef.tableName);
+        const queryString = knex.raw(query.toString(), args).toString();
+        return this.knex.raw(queryString).then((result) => this.returnResults(result, info).count);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.log('error occurred in object() :: ', err);
+        throw err;
+      }
+    };
+  }
+
   create(schemaDef) {
     const knex = this.knex;
     return (parent, args, options, info) => {
