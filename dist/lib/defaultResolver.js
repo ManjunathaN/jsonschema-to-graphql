@@ -50,14 +50,14 @@ var Resolver = function () {
         return _this2.returnResults(info);
       };
     }
-  }, {
-    key: 'count',
-    value: function count(schemaDef) {
-      return function (parent, args, options, info) {
-        console.log('count called');
-        return 0;
-      };
-    }
+
+    // count(schemaDef) {
+    //   return (parent, args, options, info) => {
+    //     console.log('count called');
+    //     return 0;
+    //   };
+    // }
+
   }, {
     key: 'create',
     value: function create(schemaDef) {

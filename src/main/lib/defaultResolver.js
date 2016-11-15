@@ -26,12 +26,12 @@ export default class Resolver {
     };
   }
 
-  count(schemaDef) {
-    return (parent, args, options, info) => {
-      console.log('count called');
-      return 0;
-    };
-  }
+  // count(schemaDef) {
+  //   return (parent, args, options, info) => {
+  //     console.log('count called');
+  //     return 0;
+  //   };
+  // }
 
   create(schemaDef) {
     return (parent, args, options, info) => {

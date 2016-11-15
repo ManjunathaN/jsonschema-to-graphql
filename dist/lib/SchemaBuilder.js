@@ -133,18 +133,20 @@ var SchemaBuilder = function () {
       }
       return retValue;
     }
-  }, {
-    key: 'processModelCountData',
-    value: function processModelCountData(modelData) {
-      var fields = _jsonSchemaUtils2.default.jsonSchemaToGraphQLFields(modelData.tableName, modelData.properties, {
-        include: modelData.opt.include,
-        exclude: modelData.opt.exclude,
-        typeDefs: this.modelTypeDefs
-      });
 
-      var retValue = this.rootCountListField(modelData, fields, true);
-      return retValue;
-    }
+    // processModelCountData(modelData) {
+    //   const fields = jsonSchemaUtils.jsonSchemaToGraphQLFields(
+    //     modelData.tableName,
+    //     modelData.properties, {
+    //       include: modelData.opt.include,
+    //       exclude: modelData.opt.exclude,
+    //       typeDefs: this.modelTypeDefs
+    //     });
+
+    //   let retValue = this.rootCountListField(modelData, fields, true);
+    //   return retValue;
+    // }
+
   }, {
     key: 'getSingleFieldName',
     value: function getSingleFieldName(modelData) {
@@ -179,8 +181,8 @@ var SchemaBuilder = function () {
         fields[listFieldName] = _this.processModelData(modelData, true, true);
 
         // Handle for List Models.
-        var countFieldName = listFieldName + "Count";
-        fields[countFieldName] = _this.processModelCountData(modelData);
+        // const countFieldName = listFieldName + "Count";
+        // fields[countFieldName] = this.processModelCountData(modelData);
       });
 
       return fields;
@@ -370,17 +372,21 @@ var SchemaBuilder = function () {
       };
       return retValue;
     }
-  }, {
-    key: 'rootCountListField',
-    value: function rootCountListField(modelData, fields, skipReqArgs) {
-      var retValue = {
-        type: _graphql.GraphQLInt,
-        args: _lodash2.default.assign({}, skipReqArgs ? {} : this.prepareArgsForModel(modelData, fields), this.skipOperatorFields ? {} : skipReqArgs ? this.prepareOperatorArgsForModel(modelData) : {}, this.skipPaginationFields ? {} : _argsFactory2.default.preparePaginationArgsForModel(), this.skipSortByFields ? {} : this.prepareSortArgsForModel(modelData.tableName)),
-        resolve: this.resolver.count(modelData.schemaDef)
-      };
 
-      return retValue;
-    }
+    // rootCountListField(modelData, fields, skipReqArgs) {
+    //   const retValue = {
+    //     type: GraphQLInt,
+    //     args: _.assign({},
+    //       skipReqArgs ? {} : this.prepareArgsForModel(modelData, fields),
+    //       this.skipOperatorFields ? {} : (skipReqArgs ? this.prepareOperatorArgsForModel(modelData) : {}),
+    //       this.skipPaginationFields ? {} : argsFactory.preparePaginationArgsForModel(),
+    //       this.skipSortByFields ? {} : this.prepareSortArgsForModel(modelData.tableName)),
+    //     resolve: this.resolver.count(modelData.schemaDef)
+    //   };
+
+    //   return retValue;
+    // }
+
 
     // eslint-disable-next-line class-methods-use-this
 

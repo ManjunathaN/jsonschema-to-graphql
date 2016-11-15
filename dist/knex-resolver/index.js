@@ -99,37 +99,34 @@ var Resolver = function () {
         }
       };
     }
+
+    // count(schemaDef) {
+    //   const knex = this.knex;
+    //   return (parent, args, options, info) => {
+    //     try {
+    //       const query = QueryBuilder.buildSelect(info.fieldASTs, knex, info, args);
+    //       query.count('1 as count').from(schemaDef.tableName);
+    //       const queryString = knex.raw(query.toString(), args).toString();
+    //       return this.knex.raw(queryString).then((result) => this.returnResults(result, info).count);
+    //     } catch (err) {
+    //       // eslint-disable-next-line no-console
+    //       console.log('error occurred in object() :: ', err);
+    //       throw err;
+    //     }
+    //   };
+    // }
+
+
   }, {
-    key: 'count',
-    value: function count(schemaDef) {
+    key: 'create',
+    value: function create(schemaDef) {
       var _this4 = this;
 
       var knex = this.knex;
       return function (parent, args, options, info) {
         try {
-          var query = _queryBuilder2.default.buildSelect(info.fieldASTs, knex, info, args);
-          query.count('1 as count').from(schemaDef.tableName);
-          var queryString = knex.raw(query.toString(), args).toString();
-          return _this4.knex.raw(queryString).then(function (result) {
-            return _this4.returnResults(result, info).count;
-          });
-        } catch (err) {
-          // eslint-disable-next-line no-console
-          console.log('error occurred in object() :: ', err);
-          throw err;
-        }
-      };
-    }
-  }, {
-    key: 'create',
-    value: function create(schemaDef) {
-      var _this5 = this;
-
-      var knex = this.knex;
-      return function (parent, args, options, info) {
-        try {
           return knex(schemaDef.tableName).insert(args, ['*']).then(function (result) {
-            return _this5.returnResults(result, info);
+            return _this4.returnResults(result, info);
           });
         } catch (err) {
           // eslint-disable-next-line no-console
@@ -141,7 +138,7 @@ var Resolver = function () {
   }, {
     key: 'update',
     value: function update(schemaDef) {
-      var _this6 = this;
+      var _this5 = this;
 
       var knex = this.knex;
       return function (parent, args, options, info) {
@@ -162,7 +159,7 @@ var Resolver = function () {
             }
             return {
               v: query.update(updateArgs, ['*']).then(function (result) {
-                return _this6.returnResults(result, info);
+                return _this5.returnResults(result, info);
               })
             };
           }();
@@ -178,7 +175,7 @@ var Resolver = function () {
   }, {
     key: 'delete',
     value: function _delete(schemaDef) {
-      var _this7 = this;
+      var _this6 = this;
 
       var knex = this.knex;
       return function (parent, args, options, info) {
@@ -190,7 +187,7 @@ var Resolver = function () {
             });
             return {
               v: query.delete('*').then(function (result) {
-                return _this7.returnResults(result, info);
+                return _this6.returnResults(result, info);
               })
             };
           }();
