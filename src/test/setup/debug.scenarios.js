@@ -36,17 +36,27 @@ export default {
     }]
   },
   scenarios: [{
-    description: 'test parameterized queries -- ',
-    query: 'query fetchMovieById($junkId: Int) {Movies(limit: $junkId, offset: $junkId) {id title userId } }',
-    args: {
-      junkId: 1
-    },
+    description: 'list queries - Users',
+    query: 'query {Users {count items {userName email id } } }',
+    // query: 'query {Users(id_Gt:2) {count items {userName email id }} }',
+    // query: 'query {Users(id_Gt:2) {count}}',
     expected: {
-      Movies: [{
-        id: 2,
-        userId: 1,
-        title: 'Title2'
-      }]
+      Users: {
+        count: 3,
+        items: [{
+          id: 1,
+          email: 'user1@email.com',
+          userName: 'user1'
+        }, {
+          id: 2,
+          email: 'user2@email.com',
+          userName: 'user2'
+        }, {
+          id: 3,
+          email: 'user3@email.com',
+          userName: 'user3'
+        }]
+      }
     }
   }]
 };

@@ -63,6 +63,7 @@ describe('integration tests', () => {
   Promise.all(testData.scenarios.map(async(testCase) => {
     it(`${testCase.description}`, async() => {
       const res = await graphql(schema, testCase.query, null, null, testCase.args);
+      // console.log(res);
       if (res.errors) {
         assert.equal(res.errors[0].message, testCase.expected.message, testCase.description);
       } else {

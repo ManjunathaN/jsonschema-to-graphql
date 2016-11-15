@@ -120,17 +120,6 @@ function handleArgument(arg, query, vardefs, userInputArgs) {
 
 function handleQuerySelectionSet(field, query, vardefs, options, userInputArgs) {
   field.arguments.map(arg => handleArgument(arg, query, vardefs, userInputArgs));
-
-  let objectName;
-  if (options.returnType instanceof GraphQLList) {
-    objectName = options.returnType.ofType.name;
-  } else {
-    objectName = options.returnType ? options.returnType.name : field.name.value;
-  }
-
-  // if (!options.returnType instanceof GraphQLScalarType) {
-  query.from(objectName.toLowerCase());
-  // }
 }
 
 module.exports = {

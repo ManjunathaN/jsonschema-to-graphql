@@ -93,19 +93,6 @@ export default class SchemaBuilder {
     return retValue;
   }
 
-  // processModelCountData(modelData) {
-  //   const fields = jsonSchemaUtils.jsonSchemaToGraphQLFields(
-  //     modelData.tableName,
-  //     modelData.properties, {
-  //       include: modelData.opt.include,
-  //       exclude: modelData.opt.exclude,
-  //       typeDefs: this.modelTypeDefs
-  //     });
-
-  //   let retValue = this.rootCountListField(modelData, fields, true);
-  //   return retValue;
-  // }
-
   getSingleFieldName(modelData) {
     const defaultFieldName = this.fieldNameForModel(modelData.tableName);
     const singleFieldName = modelData.opt.fieldName || defaultFieldName;
@@ -133,10 +120,6 @@ export default class SchemaBuilder {
       // Handle for List Models.
       const listFieldName = pluralize(singleFieldName);
       fields[listFieldName] = this.processModelData(modelData, true, true);
-
-      // Handle for List Models.
-      // const countFieldName = listFieldName + "Count";
-      // fields[countFieldName] = this.processModelCountData(modelData);
     });
 
     return fields;
@@ -153,6 +136,7 @@ export default class SchemaBuilder {
         // Skip building the root if the key is already part of Primary Key.
         if (!isPrimaryKey) {
           const tmpModelData = {
+            schemaDef: modelData.schemaDef,
             tableName: modelData.tableName,
             properties: [pkey],
             primaryKeys: [pkey.name],
@@ -307,31 +291,16 @@ export default class SchemaBuilder {
 
   rootListField(modelData, fields, skipReqArgs) {
     const retValue = {
-      type: new GraphQLList(this.typeForModel(modelData, fields)),
+      type: this.typeForModel(modelData, fields, 'list'),
       args: _.assign({},
         skipReqArgs ? {} : this.prepareArgsForModel(modelData, fields),
         this.skipOperatorFields ? {} : (skipReqArgs ? this.prepareOperatorArgsForModel(modelData) : {}),
         this.skipPaginationFields ? {} : argsFactory.preparePaginationArgsForModel(),
         this.skipSortByFields ? {} : this.prepareSortArgsForModel(modelData.tableName)),
-      resolve: this.resolver.read(modelData.schemaDef)
+      resolve: this.resolver.list(modelData.schemaDef)
     };
     return retValue;
   }
-
-  // rootCountListField(modelData, fields, skipReqArgs) {
-  //   const retValue = {
-  //     type: GraphQLInt,
-  //     args: _.assign({},
-  //       skipReqArgs ? {} : this.prepareArgsForModel(modelData, fields),
-  //       this.skipOperatorFields ? {} : (skipReqArgs ? this.prepareOperatorArgsForModel(modelData) : {}),
-  //       this.skipPaginationFields ? {} : argsFactory.preparePaginationArgsForModel(),
-  //       this.skipSortByFields ? {} : this.prepareSortArgsForModel(modelData.tableName)),
-  //     resolve: this.resolver.count(modelData.schemaDef)
-  //   };
-
-  //   return retValue;
-  // }
-
 
   // eslint-disable-next-line class-methods-use-this
   fieldNameForModel(modelClass) {
@@ -369,6 +338,19 @@ export default class SchemaBuilder {
           // pick only primary key fields exposed in delete operation.
           _.pick(fields, modelData.primaryKeys)
         );
+        break;
+      case 'list':
+        // console.log('fetchFields : modelData :: ', modelData);
+        fieldFunctions = () => _.extend({}, {
+          count: {
+            type: GraphQLInt,
+            defaultValue: 0
+          }
+        }, {
+          items: {
+            type: new GraphQLList(this.typeForModel(modelData, fields))
+          }
+        });
         break;
       default:
         fieldFunctions = () => _.extend({},
@@ -416,6 +398,7 @@ export default class SchemaBuilder {
       description: relation.description,
       args: args,
       resolve: this.resolver.relation(modelData.schemaDef, {
+        tableName: joinTableName,
         foreignKey: foreignKey,
         foreignKeyValue: relation.fields
       })

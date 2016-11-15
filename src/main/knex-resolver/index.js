@@ -3,6 +3,7 @@ import {
   GraphQLList
 } from 'graphql';
 import QueryBuilder from './queryBuilder';
+import Promise from 'bluebird';
 
 export default class Resolver {
   constructor(knex) {
@@ -13,7 +14,7 @@ export default class Resolver {
     // A fix for test cases, pg seems to return rows in result hash, whereas sqlite in result.
     // console.log('result ::', result);
     const results = result.rows || result;
-    return (info.returnType instanceof GraphQLList) ? results : _.head(results);
+    return (!info.returnType instanceof GraphQLList) ? _.head(results) : results;
   }
 
   executeQuery(schemaDef, queryString, options, info) {
@@ -31,6 +32,7 @@ export default class Resolver {
           .where({
             [relation.foreignKey]: parent[relation.foreignKeyValue]
           });
+        query.from(relation.tableName);
 
         const queryString = knex.raw(query.toString(), args).toString();
         return this.executeQuery(schemaDef, queryString, options, info);
@@ -47,6 +49,7 @@ export default class Resolver {
     return (parent, args, options, info) => {
       try {
         const query = QueryBuilder.buildSelect(info.fieldASTs, knex, info, args);
+        query.from(schemaDef.tableName);
         const queryString = knex.raw(query.toString(), args).toString();
         return this.executeQuery(schemaDef, queryString, options, info);
       } catch (err) {
@@ -57,22 +60,33 @@ export default class Resolver {
     };
   }
 
-  // count(schemaDef) {
-  //   const knex = this.knex;
-  //   return (parent, args, options, info) => {
-  //     try {
-  //       const query = QueryBuilder.buildSelect(info.fieldASTs, knex, info, args);
-  //       query.count('1 as count').from(schemaDef.tableName);
-  //       const queryString = knex.raw(query.toString(), args).toString();
-  //       return this.knex.raw(queryString).then((result) => this.returnResults(result, info).count);
-  //     } catch (err) {
-  //       // eslint-disable-next-line no-console
-  //       console.log('error occurred in object() :: ', err);
-  //       throw err;
-  //     }
-  //   };
-  // }
+  list(schemaDef) {
+    const knex = this.knex;
+    return (parent, args, options, info) => {
+      try {
+        const countQuery = QueryBuilder.buildSelect(info.fieldASTs, knex, info, args);
+        countQuery.count('1 as count').from(schemaDef.tableName);
+        const countQueryString = knex.raw(countQuery.toString(), args).toString();
 
+        const itemQuery = QueryBuilder.buildSelect(info.fieldASTs, knex, info, args);
+        itemQuery.from(schemaDef.tableName);
+        const itemQueryString = knex.raw(itemQuery.toString(), args).toString();
+
+        return Promise.join(this.knex.raw(countQueryString),
+          this.executeQuery(schemaDef, itemQueryString, options, info),
+          (countResult, itemResult) => {
+            return {
+              count: _.head(this.returnResults(countResult, info)).count,
+              items: itemResult
+            }
+          });
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.log('error occurred in object() :: ', err);
+        throw err;
+      }
+    };
+  }
 
   create(schemaDef) {
     const knex = this.knex;
