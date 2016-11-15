@@ -238,433 +238,538 @@ export default {
     // TODO: add default limit to list queries.
     {
       description: 'list queries - Users',
-      query: 'query {Users { userName,email,id}}',
+      query: 'query {Users {count items { userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }, {
-          id: 2,
-          email: 'user2@email.com',
-          userName: 'user2'
-        }, {
-          id: 3,
-          email: 'user3@email.com',
-          userName: 'user3'
-        }]
+        Users: {
+          count: 3,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }, {
+            id: 2,
+            email: 'user2@email.com',
+            userName: 'user2'
+          }, {
+            id: 3,
+            email: 'user3@email.com',
+            userName: 'user3'
+          }]
+        }
       }
     },
     // Test for Integer field
     {
       description: 'list queries - Users',
-      query: 'query {Users(id:3) { userName,email,id}}',
+      query: 'query {Users(id:3) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 3,
-          email: 'user3@email.com',
-          userName: 'user3'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 3,
+            email: 'user3@email.com',
+            userName: 'user3'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - id > 2',
-      query: 'query {Users(id_Gt : 2) { userName,email,id}}',
+      query: 'query {Users(id_Gt : 2) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 3,
-          email: 'user3@email.com',
-          userName: 'user3'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 3,
+            email: 'user3@email.com',
+            userName: 'user3'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - id >= 2',
-      query: 'query {Users(id_Gte : 2) { userName,email,id}}',
+      query: 'query {Users(id_Gte : 2) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 2,
-          email: 'user2@email.com',
-          userName: 'user2'
-        }, {
-          id: 3,
-          email: 'user3@email.com',
-          userName: 'user3'
-        }]
+        Users: {
+          count: 2,
+          items: [{
+            id: 2,
+            email: 'user2@email.com',
+            userName: 'user2'
+          }, {
+            id: 3,
+            email: 'user3@email.com',
+            userName: 'user3'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - id < 2',
-      query: 'query {Users(id_Lt : 2) { userName,email,id}}',
+      query: 'query {Users(id_Lt : 2) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - id <= 2',
-      query: 'query {Users(id_Lte : 2) { userName,email,id}}',
+      query: 'query {Users(id_Lte : 2) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }, {
-          id: 2,
-          email: 'user2@email.com',
-          userName: 'user2'
-        }]
+        Users: {
+          count: 2,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }, {
+            id: 2,
+            email: 'user2@email.com',
+            userName: 'user2'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - id != 3',
-      query: 'query {Users(id_Ne : 3) { userName,email,id}}',
+      query: 'query {Users(id_Ne : 3) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }, {
-          id: 2,
-          email: 'user2@email.com',
-          userName: 'user2'
-        }]
+        Users: {
+          count: 2,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }, {
+            id: 2,
+            email: 'user2@email.com',
+            userName: 'user2'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - id in 1',
-      query: 'query {Users(id_In : 1) { userName,email,id}}',
+      query: 'query {Users(id_In : 1) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - id in 1,2',
-      query: 'query {Users(id_In : [1,2]) { userName,email,id}}',
+      query: 'query {Users(id_In : [1,2]) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }, {
-          id: 2,
-          email: 'user2@email.com',
-          userName: 'user2'
-        }]
+        Users: {
+          count: 2,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }, {
+            id: 2,
+            email: 'user2@email.com',
+            userName: 'user2'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - id not in 3',
-      query: 'query {Users(id_NotIn : 3) { userName,email,id}}',
+      query: 'query {Users(id_NotIn : 3) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }, {
-          id: 2,
-          email: 'user2@email.com',
-          userName: 'user2'
-        }]
+        Users: {
+          count: 2,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }, {
+            id: 2,
+            email: 'user2@email.com',
+            userName: 'user2'
+          }]
+        }
       }
     }, {
-      description: 'list queries - Users - id in 1,2',
-      query: 'query {Users(id_NotIn : [1,2]) { userName,email,id}}',
+      description: 'list queries - Users - id not in 1,2',
+      query: 'query {Users(id_NotIn : [1,2]) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 3,
-          email: 'user3@email.com',
-          userName: 'user3'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 3,
+            email: 'user3@email.com',
+            userName: 'user3'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - parentId is null',
-      query: 'query {Users(parentId_IsNull:true) { userName,email,id}}',
+      query: 'query {Users(parentId_IsNull:true) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - parentId is not null',
-      query: 'query {Users(parentId_IsNull:false) { userName,email,id}}',
+      query: 'query {Users(parentId_IsNull:false) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 2,
-          email: 'user2@email.com',
-          userName: 'user2'
-        }, {
-          id: 3,
-          email: 'user3@email.com',
-          userName: 'user3'
-        }]
+        Users: {
+          count: 2,
+          items: [{
+            id: 2,
+            email: 'user2@email.com',
+            userName: 'user2'
+          }, {
+            id: 3,
+            email: 'user3@email.com',
+            userName: 'user3'
+          }]
+        }
       }
     },
     // Check for String Operations...
     {
       description: 'list queries - Users where email is user3@email.com',
-      query: 'query {Users(email:"user3@email.com") { userName,email,id}}',
+      query: 'query {Users(email:"user3@email.com") { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 3,
-          email: 'user3@email.com',
-          userName: 'user3'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 3,
+            email: 'user3@email.com',
+            userName: 'user3'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - email > email:"user3@email.com"',
-      query: 'query {Users(email_Gt: "user2@email.com") { userName,email,id}}',
+      query: 'query {Users(email_Gt: "user2@email.com") { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 3,
-          email: 'user3@email.com',
-          userName: 'user3'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 3,
+            email: 'user3@email.com',
+            userName: 'user3'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - email >= email:"user2@email.com"',
-      query: 'query {Users(email_Gte : "user2@email.com") { userName,email,id}}',
+      query: 'query {Users(email_Gte : "user2@email.com") { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 2,
-          email: 'user2@email.com',
-          userName: 'user2'
-        }, {
-          id: 3,
-          email: 'user3@email.com',
-          userName: 'user3'
-        }]
+        Users: {
+          count: 2,
+          items: [{
+            id: 2,
+            email: 'user2@email.com',
+            userName: 'user2'
+          }, {
+            id: 3,
+            email: 'user3@email.com',
+            userName: 'user3'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - email < "user2@email.com"',
-      query: 'query {Users(email_Lt : "user2@email.com") { userName,email,id}}',
+      query: 'query {Users(email_Lt : "user2@email.com") { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - email <= "user2@email.com"',
-      query: 'query {Users(email_Lte : "user2@email.com") { userName,email,id}}',
+      query: 'query {Users(email_Lte : "user2@email.com") { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }, {
-          id: 2,
-          email: 'user2@email.com',
-          userName: 'user2'
-        }]
+        Users: {
+          count: 2,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }, {
+            id: 2,
+            email: 'user2@email.com',
+            userName: 'user2'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - email != "user3@email.com"',
-      query: 'query {Users(email_Ne : "user3@email.com") { userName,email,id}}',
+      query: 'query {Users(email_Ne : "user3@email.com") { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }, {
-          id: 2,
-          email: 'user2@email.com',
-          userName: 'user2'
-        }]
+        Users: {
+          count: 2,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }, {
+            id: 2,
+            email: 'user2@email.com',
+            userName: 'user2'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - email in "user1@email.com"',
-      query: 'query {Users(email_In : "user1@email.com") { userName,email,id}}',
+      query: 'query {Users(email_In : "user1@email.com") { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - email in "user1@email.com", "user2@email.com"',
-      query: 'query {Users(email_In : ["user1@email.com","user2@email.com"]) { userName,email,id}}',
+      query: 'query {Users(email_In : ["user1@email.com","user2@email.com"]) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }, {
-          id: 2,
-          email: 'user2@email.com',
-          userName: 'user2'
-        }]
+        Users: {
+          count: 2,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }, {
+            id: 2,
+            email: 'user2@email.com',
+            userName: 'user2'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - email not in "user3@email.com"',
-      query: 'query {Users(email_NotIn : "user3@email.com") { userName,email,id}}',
+      query: 'query {Users(email_NotIn : "user3@email.com") { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }, {
-          id: 2,
-          email: 'user2@email.com',
-          userName: 'user2'
-        }]
+        Users: {
+          count: 2,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }, {
+            id: 2,
+            email: 'user2@email.com',
+            userName: 'user2'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - email not in "user1@email.com","user2@email.com"',
-      query: 'query {Users(email_NotIn : ["user1@email.com","user2@email.com"]) { userName,email,id}}',
+      query: 'query {Users(email_NotIn : ["user1@email.com","user2@email.com"]) { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 3,
-          email: 'user3@email.com',
-          userName: 'user3'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 3,
+            email: 'user3@email.com',
+            userName: 'user3'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - like is "%ser1@%"',
-      query: 'query {Users(email_Like:"%ser1@%") { userName,email,id}}',
+      query: 'query {Users(email_Like:"%ser1@%") { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - like is "user1@"',
-      query: 'query {Users(email_Like:"user1@%") { userName,email,id}}',
+      query: 'query {Users(email_Like:"user1@%") { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - like ignore case is "UsEr1%"',
-      query: 'query {Users(email_LikeNoCase:"UsEr1%") { userName,email,id}}',
+      query: 'query {Users(email_LikeNoCase:"UsEr1%") { count items {userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }]
+        }
       }
     }, {
       description: 'list queries - Users - like ignore case is "%sEr1%"',
-      query: 'query {Users(email_LikeNoCase:"%sEr1%") { userName,email,id}}',
+      query: 'query {Users(email_LikeNoCase:"%sEr1%") {count items { userName,email,id}}}',
       expected: {
-        Users: [{
-          id: 1,
-          email: 'user1@email.com',
-          userName: 'user1'
-        }]
+        Users: {
+          count: 1,
+          items: [{
+            id: 1,
+            email: 'user1@email.com',
+            userName: 'user1'
+          }]
+        }
       }
     },
     // Parameterized Queries..
     {
       description: 'list queries - Movies - Parameterized query',
-      query: 'query fetchMovieById ($movieId: Int){Movies(id: $movieId){id, title, userId } }',
+      query: 'query fetchMovieById ($movieId: Int){Movies(id: $movieId){count items {id, title, userId } }}',
       args: {
         movieId: 1
       },
       expected: {
-        Movies: [{
-          id: 1,
-          userId: 1,
-          title: 'Title1'
-        }]
+        Movies: {
+          count: 1,
+          items: [{
+            id: 1,
+            userId: 1,
+            title: 'Title1'
+          }]
+        }
       }
     }, {
       description: 'test parameterized queries -- ',
-      query: 'query fetchMovieById($junkId: [Int]) {Movies(id_In: $junkId) {id title userId } }',
+      query: 'query fetchMovieById($junkId: [Int]) {Movies(id_In: $junkId) {count items {id title userId } }}',
       args: {
         junkId: 1
       },
       expected: {
-        Movies: [{
-          id: 1,
-          userId: 1,
-          title: 'Title1'
-        }]
+        Movies: {
+          count: 1,
+          items: [{
+            id: 1,
+            userId: 1,
+            title: 'Title1'
+          }]
+        }
       }
     }, {
       description: 'test parameterized queries -- ',
-      query: 'query fetchMovieById($junkId: [Int]) {Movies(id_In: $junkId) {id title userId } }',
+      query: 'query fetchMovieById($junkId: [Int]) {Movies(id_In: $junkId) {count items {id title userId } }}',
       args: {
         junkId: [1, 2]
       },
       expected: {
-        Movies: [{
-          id: 1,
-          userId: 1,
-          title: 'Title1'
-        }, {
-          id: 2,
-          userId: 1,
-          title: 'Title2'
-        }]
+        Movies: {
+          count: 2,
+          items: [{
+            id: 1,
+            userId: 1,
+            title: 'Title1'
+          }, {
+            id: 2,
+            userId: 1,
+            title: 'Title2'
+          }]
+        }
       }
     }, {
       description: 'test parameterized queries -- limit and offset',
-      query: 'query fetchMovieById($junkId: Int) {Movies(limit: $junkId, offset: $junkId) {id title userId } }',
+      query: 'query fetchMovieById($junkId: Int) {Movies(limit: $junkId, offset: $junkId) {count items {id title userId } }}',
       args: {
         junkId: 1
       },
       expected: {
-        Movies: [{
-          id: 2,
-          userId: 1,
-          title: 'Title2'
-        }]
+        Movies: {
+          count: 3,
+          items: [{
+            id: 2,
+            userId: 1,
+            title: 'Title2'
+          }]
+        }
       }
     },
     // Test Aliases Support
     {
       description: 'test aliases',
-      query: 'query {maleUsers: Users(gender: "Male") {id } femaleUsers: Users(gender: "Female") {id email } }',
+      query: 'query {maleUsers: Users(gender: "Male") {count items {id }} femaleUsers: Users(gender: "Female") {count items {id email } }}',
       expected: {
-        femaleUsers: [{
-          id: 2,
-          email: 'user2@email.com'
-        }],
-        maleUsers: [{
-          id: 1
-        }, {
-          id: 3
-        }]
+        femaleUsers: {
+          count: 1,
+          items: [{
+            id: 2,
+            email: 'user2@email.com'
+          }]
+        },
+        maleUsers: {
+          count: 2,
+          items: [{
+            id: 1
+          }, {
+            id: 3
+          }]
+        }
       }
     },
     // Test Fragment Support
     {
       description: 'test fragments',
-      query: '{maleUsers: Users(gender: "Male") {...comparisonFields } femaleUsers: Users(gender: "Female") {...comparisonFields } } fragment comparisonFields on User {id email movies {id title } }',
+      query: '{maleUsers: Users(gender: "Male") {...comparisonFields } femaleUsers: Users(gender: "Female") {...comparisonFields } } fragment comparisonFields on ListUser {count items {id email movies {id title } }}',
       expected: {
-        maleUsers: [{
-          id: 1,
-          email: 'user1@email.com',
-          movies: [{
+        maleUsers: {
+          count: 2,
+          items: [{
             id: 1,
-            title: 'Title1'
+            email: 'user1@email.com',
+            movies: [{
+              id: 1,
+              title: 'Title1'
+            }, {
+              id: 2,
+              title: 'Title2'
+            }]
           }, {
-            id: 2,
-            title: 'Title2'
-          }]
-        }, {
-          id: 3,
-          email: 'user3@email.com',
-          movies: []
-        }],
-        femaleUsers: [{
-          id: 2,
-          email: 'user2@email.com',
-          movies: [{
             id: 3,
-            title: 'Title3'
+            email: 'user3@email.com',
+            movies: []
           }]
-        }]
+        },
+        femaleUsers: {
+          count: 1,
+          items: [{
+            id: 2,
+            email: 'user2@email.com',
+            movies: [{
+              id: 3,
+              title: 'Title3'
+            }]
+          }]
+        }
       }
     }
   ]

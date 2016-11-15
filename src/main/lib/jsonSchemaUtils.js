@@ -131,7 +131,7 @@ const scalarToGraphQLType = (type) => {
   }
 };
 
-const primitiveToGraphQLField = function(type) {
+const primitiveToGraphQLField = (type) => {
   const graphQlType = primitiveToGraphQLType(type);
 
   if (!graphQlType) {

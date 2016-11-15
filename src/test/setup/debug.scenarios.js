@@ -36,13 +36,11 @@ export default {
     }]
   },
   scenarios: [{
-    description: 'list queries - Users',
-    query: 'query {Users {count items {userName email id } } }',
-    // query: 'query {Users(id_Gt:2) {count items {userName email id }} }',
-    // query: 'query {Users(id_Gt:2) {count}}',
+    description: 'list queries - Users - id in 1,2',
+    query: 'query {Users(id_In : [1,2]) { count items {userName,email,id}}}',
     expected: {
       Users: {
-        count: 3,
+        count: 2,
         items: [{
           id: 1,
           email: 'user1@email.com',
@@ -51,10 +49,6 @@ export default {
           id: 2,
           email: 'user2@email.com',
           userName: 'user2'
-        }, {
-          id: 3,
-          email: 'user3@email.com',
-          userName: 'user3'
         }]
       }
     }

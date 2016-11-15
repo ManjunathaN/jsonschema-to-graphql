@@ -1,7 +1,3 @@
-import {
-  GraphQLScalarType,
-  GraphQLList
-} from 'graphql';
 import _ from 'lodash';
 import knex from 'knex';
 import argsFactory from '../lib/argsFactory';

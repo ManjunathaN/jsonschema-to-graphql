@@ -1,9 +1,10 @@
 import _ from 'lodash';
 import {
-  GraphQLList
+  GraphQLList,
+  GraphQLObjectType
 } from 'graphql';
-import QueryBuilder from './queryBuilder';
 import Promise from 'bluebird';
+import QueryBuilder from './queryBuilder';
 
 export default class Resolver {
   constructor(knex) {
@@ -12,16 +13,20 @@ export default class Resolver {
 
   returnResults(result, info) {
     // A fix for test cases, pg seems to return rows in result hash, whereas sqlite in result.
-    // console.log('result ::', result);
+    // console.log('result ::', info.returnType);
     const results = result.rows || result;
-    return (!info.returnType instanceof GraphQLList) ? _.head(results) : results;
+    if (info.returnType instanceof GraphQLList ||
+      (info.returnType instanceof GraphQLObjectType && _.startsWith(info.returnType.name, 'List'))) {
+      return results;
+    }
+    return _.head(results);
   }
 
   executeQuery(schemaDef, queryString, options, info) {
     if (options && options.dataLoader) {
-      return options.dataLoader.load(queryString).then((result) => this.returnResults(result, info));
+      return options.dataLoader.load(queryString).then(result => this.returnResults(result, info));
     }
-    return this.knex.raw(queryString).then((result) => this.returnResults(result, info));
+    return this.knex.raw(queryString).then(result => this.returnResults(result, info));
   }
 
   relation(schemaDef, relation) {
@@ -38,7 +43,7 @@ export default class Resolver {
         return this.executeQuery(schemaDef, queryString, options, info);
       } catch (err) {
         // eslint-disable-next-line no-console
-        console.log('error occurred in object() :: ', err);
+        // console.log('error occurred in object() :: ', err);
         throw err;
       }
     };
@@ -54,7 +59,7 @@ export default class Resolver {
         return this.executeQuery(schemaDef, queryString, options, info);
       } catch (err) {
         // eslint-disable-next-line no-console
-        console.log('error occurred in object() :: ', err);
+        // console.log('error occurred in object() :: ', err);
         throw err;
       }
     };
@@ -65,12 +70,15 @@ export default class Resolver {
     return (parent, args, options, info) => {
       try {
         const countQuery = QueryBuilder.buildSelect(info.fieldASTs, knex, info, args);
-        countQuery.count('1 as count').from(schemaDef.tableName);
+        countQuery.count('1 as count').from(schemaDef.tableName).limit(Number.MAX_SAFE_INTEGER).offset(0);
         const countQueryString = knex.raw(countQuery.toString(), args).toString();
 
         const itemQuery = QueryBuilder.buildSelect(info.fieldASTs, knex, info, args);
         itemQuery.from(schemaDef.tableName);
         const itemQueryString = knex.raw(itemQuery.toString(), args).toString();
+
+        // console.log('countQueryString :: ', countQueryString);
+        // console.log('itemQueryString :: ', itemQueryString);
 
         return Promise.join(this.knex.raw(countQueryString),
           this.executeQuery(schemaDef, itemQueryString, options, info),
@@ -78,7 +86,7 @@ export default class Resolver {
             return {
               count: _.head(this.returnResults(countResult, info)).count,
               items: itemResult
-            }
+            };
           });
       } catch (err) {
         // eslint-disable-next-line no-console
@@ -92,7 +100,7 @@ export default class Resolver {
     const knex = this.knex;
     return (parent, args, options, info) => {
       try {
-        return knex(schemaDef.tableName).insert(args, ['*']).then((result) =>
+        return knex(schemaDef.tableName).insert(args, ['*']).then(result =>
           this.returnResults(result, info));
       } catch (err) {
         // eslint-disable-next-line no-console
@@ -119,7 +127,7 @@ export default class Resolver {
         if (_.isEmpty(updateArgs)) {
           throw new Error('Nothing to update');
         }
-        return query.update(updateArgs, ['*']).then((result) => this.returnResults(result, info));
+        return query.update(updateArgs, ['*']).then(result => this.returnResults(result, info));
       } catch (err) {
         // eslint-disable-next-line no-console
         console.log('error occurred in object() :: ', err);
@@ -133,8 +141,8 @@ export default class Resolver {
     return (parent, args, options, info) => {
       try {
         const query = knex(schemaDef.tableName);
-        _.each(args, (value, arg) => query.where(arg, value))
-        return query.delete('*').then((result) => this.returnResults(result, info));
+        _.each(args, (value, arg) => query.where(arg, value));
+        return query.delete('*').then(result => this.returnResults(result, info));
       } catch (err) {
         // eslint-disable-next-line no-console
         console.log('error occurred in object() :: ', err);
