@@ -1,7 +1,5 @@
 'use strict';
 
-var _graphql = require('graphql');
-
 var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -135,17 +133,6 @@ function handleQuerySelectionSet(field, query, vardefs, options, userInputArgs) 
   field.arguments.map(function (arg) {
     return handleArgument(arg, query, vardefs, userInputArgs);
   });
-
-  var objectName = void 0;
-  if (options.returnType instanceof _graphql.GraphQLList) {
-    objectName = options.returnType.ofType.name;
-  } else {
-    objectName = options.returnType ? options.returnType.name : field.name.value;
-  }
-
-  // if (!options.returnType instanceof GraphQLScalarType) {
-  query.from(objectName.toLowerCase());
-  // }
 }
 
 module.exports = {

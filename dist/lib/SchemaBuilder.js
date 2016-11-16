@@ -133,20 +133,6 @@ var SchemaBuilder = function () {
       }
       return retValue;
     }
-
-    // processModelCountData(modelData) {
-    //   const fields = jsonSchemaUtils.jsonSchemaToGraphQLFields(
-    //     modelData.tableName,
-    //     modelData.properties, {
-    //       include: modelData.opt.include,
-    //       exclude: modelData.opt.exclude,
-    //       typeDefs: this.modelTypeDefs
-    //     });
-
-    //   let retValue = this.rootCountListField(modelData, fields, true);
-    //   return retValue;
-    // }
-
   }, {
     key: 'getSingleFieldName',
     value: function getSingleFieldName(modelData) {
@@ -179,10 +165,6 @@ var SchemaBuilder = function () {
         // Handle for List Models.
         var listFieldName = (0, _pluralize2.default)(singleFieldName);
         fields[listFieldName] = _this.processModelData(modelData, true, true);
-
-        // Handle for List Models.
-        // const countFieldName = listFieldName + "Count";
-        // fields[countFieldName] = this.processModelCountData(modelData);
       });
 
       return fields;
@@ -204,6 +186,7 @@ var SchemaBuilder = function () {
           // Skip building the root if the key is already part of Primary Key.
           if (!isPrimaryKey) {
             var tmpModelData = {
+              schemaDef: modelData.schemaDef,
               tableName: modelData.tableName,
               properties: [pkey],
               primaryKeys: [pkey.name],
@@ -366,27 +349,12 @@ var SchemaBuilder = function () {
     key: 'rootListField',
     value: function rootListField(modelData, fields, skipReqArgs) {
       var retValue = {
-        type: new _graphql.GraphQLList(this.typeForModel(modelData, fields)),
+        type: this.typeForModel(modelData, fields, 'list'),
         args: _lodash2.default.assign({}, skipReqArgs ? {} : this.prepareArgsForModel(modelData, fields), this.skipOperatorFields ? {} : skipReqArgs ? this.prepareOperatorArgsForModel(modelData) : {}, this.skipPaginationFields ? {} : _argsFactory2.default.preparePaginationArgsForModel(), this.skipSortByFields ? {} : this.prepareSortArgsForModel(modelData.tableName)),
-        resolve: this.resolver.read(modelData.schemaDef)
+        resolve: this.resolver.list(modelData.schemaDef)
       };
       return retValue;
     }
-
-    // rootCountListField(modelData, fields, skipReqArgs) {
-    //   const retValue = {
-    //     type: GraphQLInt,
-    //     args: _.assign({},
-    //       skipReqArgs ? {} : this.prepareArgsForModel(modelData, fields),
-    //       this.skipOperatorFields ? {} : (skipReqArgs ? this.prepareOperatorArgsForModel(modelData) : {}),
-    //       this.skipPaginationFields ? {} : argsFactory.preparePaginationArgsForModel(),
-    //       this.skipSortByFields ? {} : this.prepareSortArgsForModel(modelData.tableName)),
-    //     resolve: this.resolver.count(modelData.schemaDef)
-    //   };
-
-    //   return retValue;
-    // }
-
 
     // eslint-disable-next-line class-methods-use-this
 
@@ -434,6 +402,21 @@ var SchemaBuilder = function () {
             return _lodash2.default.extend({},
             // pick only primary key fields exposed in delete operation.
             _lodash2.default.pick(fields, modelData.primaryKeys));
+          };
+          break;
+        case 'list':
+          // console.log('fetchFields : modelData :: ', modelData);
+          fieldFunctions = function fieldFunctions() {
+            return _lodash2.default.extend({}, {
+              count: {
+                type: _graphql.GraphQLInt,
+                defaultValue: 0
+              }
+            }, {
+              items: {
+                type: new _graphql.GraphQLList(_this3.typeForModel(modelData, fields))
+              }
+            });
           };
           break;
         default:
@@ -484,6 +467,7 @@ var SchemaBuilder = function () {
         description: relation.description,
         args: args,
         resolve: this.resolver.relation(modelData.schemaDef, {
+          tableName: joinTableName,
           foreignKey: foreignKey,
           foreignKeyValue: relation.fields
         })
