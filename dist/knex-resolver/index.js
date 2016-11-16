@@ -84,7 +84,7 @@ var Resolver = function () {
           return _this2.executeQuery(schemaDef, queryString, options, info);
         } catch (err) {
           // eslint-disable-next-line no-console
-          // console.log('error occurred in object() :: ', err);
+          console.log('error occurred in object() :: ', err);
           throw err;
         }
       };
@@ -103,7 +103,7 @@ var Resolver = function () {
           return _this3.executeQuery(schemaDef, queryString, options, info);
         } catch (err) {
           // eslint-disable-next-line no-console
-          // console.log('error occurred in object() :: ', err);
+          console.log('error occurred in object() :: ', err);
           throw err;
         }
       };
@@ -117,7 +117,9 @@ var Resolver = function () {
       return function (parent, args, options, info) {
         try {
           var countQuery = _queryBuilder2.default.buildSelect(info.fieldASTs, knex, info, args);
-          countQuery.count('1 as count').from(schemaDef.tableName).limit(Number.MAX_SAFE_INTEGER).offset(0);
+          // countQuery.count('1 as count');
+          countQuery.select(knex.raw('count(1) as count'));
+          countQuery.from(schemaDef.tableName).limit(Number.MAX_SAFE_INTEGER).offset(0);
           var countQueryString = knex.raw(countQuery.toString(), args).toString();
 
           var itemQuery = _queryBuilder2.default.buildSelect(info.fieldASTs, knex, info, args);

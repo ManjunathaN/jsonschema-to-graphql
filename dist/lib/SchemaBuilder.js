@@ -155,7 +155,7 @@ var SchemaBuilder = function () {
 
       // Handle only for Single Model.
       _lodash2.default.forOwn(this.models, function (modelData) {
-        var singleFieldName = _this.getSingleFieldName(modelData);
+        var singleFieldName = (0, _pluralize2.default)(_this.getSingleFieldName(modelData), 1);
 
         fields[singleFieldName] = _this.processModelData(modelData);
         if (!_this.skipConstraintModels) {

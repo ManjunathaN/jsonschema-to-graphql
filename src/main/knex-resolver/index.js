@@ -43,7 +43,7 @@ export default class Resolver {
         return this.executeQuery(schemaDef, queryString, options, info);
       } catch (err) {
         // eslint-disable-next-line no-console
-        // console.log('error occurred in object() :: ', err);
+        console.log('error occurred in object() :: ', err);
         throw err;
       }
     };
@@ -59,7 +59,7 @@ export default class Resolver {
         return this.executeQuery(schemaDef, queryString, options, info);
       } catch (err) {
         // eslint-disable-next-line no-console
-        // console.log('error occurred in object() :: ', err);
+        console.log('error occurred in object() :: ', err);
         throw err;
       }
     };
@@ -70,7 +70,9 @@ export default class Resolver {
     return (parent, args, options, info) => {
       try {
         const countQuery = QueryBuilder.buildSelect(info.fieldASTs, knex, info, args);
-        countQuery.count('1 as count').from(schemaDef.tableName).limit(Number.MAX_SAFE_INTEGER).offset(0);
+        // countQuery.count('1 as count');
+        countQuery.select(knex.raw('count(1) as count'));
+        countQuery.from(schemaDef.tableName).limit(Number.MAX_SAFE_INTEGER).offset(0);
         const countQueryString = knex.raw(countQuery.toString(), args).toString();
 
         const itemQuery = QueryBuilder.buildSelect(info.fieldASTs, knex, info, args);

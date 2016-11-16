@@ -110,7 +110,7 @@ export default class SchemaBuilder {
 
     // Handle only for Single Model.
     _.forOwn(this.models, (modelData) => {
-      const singleFieldName = this.getSingleFieldName(modelData);
+      const singleFieldName = pluralize(this.getSingleFieldName(modelData), 1);
 
       fields[singleFieldName] = this.processModelData(modelData);
       if (!this.skipConstraintModels) {
