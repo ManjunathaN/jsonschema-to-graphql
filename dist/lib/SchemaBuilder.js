@@ -440,7 +440,7 @@ var SchemaBuilder = function () {
       var fields = {};
 
       _lodash2.default.forOwn(modelData.foreignKeys, function (relation) {
-        var joinTableName = _this4.fieldNameForModel(relation.reference.resource);
+        var joinTableName = relation.reference.resource;
         fields[relation.name] = _this4.relationField(modelData, joinTableName, relation);
       });
 

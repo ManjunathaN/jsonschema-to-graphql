@@ -369,7 +369,7 @@ export default class SchemaBuilder {
     const fields = {};
 
     _.forOwn(modelData.foreignKeys, (relation) => {
-      const joinTableName = this.fieldNameForModel(relation.reference.resource);
+      const joinTableName = relation.reference.resource;
       fields[relation.name] = this.relationField(modelData, joinTableName, relation);
     });
 
